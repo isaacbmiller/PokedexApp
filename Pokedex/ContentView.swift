@@ -4,44 +4,41 @@
 //
 //  Created by Isaac Miller on 11/14/22.
 //
+// UI inspired by https://dribbble.com/shots/6540871-Pokedex-App/attachments/6540871-Pokedex-App?mode=media
 
 import SwiftUI
 
 struct ContentView: View {
     @ObservedObject var pokeAPI: PokeAPI
+    @State var selectedPokemon: Pokemon? = nil
     
     var body: some View {
-        ScrollView {
-            HStack {
-                Text("Pokedex")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                Spacer()
-            }.padding(.horizontal)
-            InfiniteGrid(data: $pokeAPI.PokemonLinks, isLoading: $pokeAPI.isLoading, loadMore: pokeAPI.loadMore, content: {data in
-                NavigationLink(destination: ContentView(pokeAPI: pokeAPI)) {
-                    PokemonCell(pokemonData: data)
-                }
-                
-            })
+        NavigationView {
+            ScrollView {
+                InfiniteGrid(data: $pokeAPI.PokemonLinks, isLoading: $pokeAPI.isLoading, loadMore: pokeAPI.loadMore, content: {data in
+                    // Create a link to each pokemons page on load
+                    NavigationLink(destination: IndividualPokemonView(pokemon: data.pokemon!), tag: data.pokemon!, selection: $selectedPokemon) {
+                        PokemonCell(pokemonData: data)
+                            .onTapGesture {
+                                selectedPokemon = data.pokemon!
+                            }
+                            .padding(.vertical, 4)
+                            .padding(.horizontal, 2)
+                    }
+                    
+                    
+                })
                 .padding(.horizontal)
+            }
+            .frame(maxWidth: .infinity)
+            .navigationTitle("Pokedex")
         }
-        .frame(maxWidth: .infinity)
-        .navigationTitle("Pokedex")
         
     }
 }
 
 struct PokemonCell: View {
     var pokemonData: any PokemonData
-    var color: UIColor {
-        get {
-            if let pokemon = pokemonData.pokemon {
-                return TypeColors.getColor(type: pokemon.types[0].type.name)
-            }
-            return .gray
-        }
-    }
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
             HStack {
@@ -52,31 +49,35 @@ struct PokemonCell: View {
                         .fontWeight(.bold)
                         .lineLimit(1)
                         .foregroundColor(.white)
+                        .padding(.bottom, 3)
                     ForEach(pokemonData.pokemon!.types) { pokemonType in
                         TypePill(pokemonType: pokemonType)
                     }
+                    Spacer()
                 }
-//                .shadow(radius: 10)
                 Spacer()
                 
-                CacheAsyncImage(url: pokemonData.pokemon!.sprites.frontDefaultURL) { phase in
-                    phase.image
+                CacheAsyncImage(url: pokemonData.pokemon!.sprites.other!.officialArtwork.frontDefaultURL) { phase in
+                    phase.image?
+                        .resizable()
+                        .frame(height: 75)
+                        .aspectRatio(contentMode: .fit)
+                        
                 }
-                .aspectRatio(1, contentMode: .fit)
-                .frame(maxWidth: 50)
+                
             }
-            .padding(.horizontal)
+            .padding(.all)
             
             Image("PokeballClear")
-                .opacity(0.7)
+                .opacity(0.4)
                 .zIndex(-1)
                 .padding(.bottom, 5)
                 .padding(.trailing, 5)
             
         }
         
-        
-        .background(Color(uiColor: self.color))
+        .frame(height: 125)
+        .background(Color(uiColor: pokemonData.pokemon!.typeColor))
         .cornerRadius(10)
         .edgesIgnoringSafeArea([.horizontal, .bottom])
         .shadow(radius: 10)
@@ -87,17 +88,19 @@ struct PokemonCell: View {
         var pokemonType: Pokemon.TypeElement
         var body: some View {
             ZStack(alignment: .center) {
-                Rectangle()
-                    .foregroundColor(.white)
-                    .opacity(0.4)
-                    .cornerRadius(20)
-                    
                 Text(pokemonType.type.name.capitalized)
                     .foregroundColor(.white)
+                    .font(.caption)
                     .fontWeight(.bold)
+                    .padding(.horizontal, 7)
+                    .padding(.vertical, 2)
+                    .background {
+                        Color.white
+                            .foregroundColor(.white)
+                            .opacity(0.4)
+                            .cornerRadius(20)
+                    }
             }
-            .frame(maxWidth: 75, maxHeight: 25)
-                
         }
     }
 }

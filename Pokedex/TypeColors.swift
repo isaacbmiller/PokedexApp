@@ -8,25 +8,6 @@ import UIKit
 import Foundation
 
 public enum TypeColors {
-    case normal
-    case fire
-    case water
-    case electric
-    case grass
-    case ice
-    case fighting
-    case poison
-    case ground
-    case flying
-    case psychic
-    case bug
-    case rock
-    case ghost
-    case dragon
-    case dark
-    case steel
-    case fairy
-    
     static let normalValue = UIColor(red: 0.67, green: 0.67, blue: 0.51, alpha: 1.00)
     static let fireValue = UIColor(red: 0.93, green: 0.51, blue: 0.25, alpha: 1.00)
     static let waterValue = UIColor(red: 0.25, green: 0.51, blue: 0.93, alpha: 1.00)
