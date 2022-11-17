@@ -115,15 +115,15 @@ struct ContentView_Previews: PreviewProvider {
 
 struct InfiniteGrid<Data, Content>: View
 where Data : RandomAccessCollection, Data.Element : Hashable, Data.Element : PokemonData, Content : View  {
-  @Binding var data: Data // 1
-  @Binding var isLoading: Bool // 2
-  let loadMore: () async throws -> () // 3
-  let content: (Data.Element) -> Content // 4
+  @Binding var data: Data
+  @Binding var isLoading: Bool
+  let loadMore: () async throws -> ()
+  let content: (Data.Element) -> Content
 
   init(data: Binding<Data>,
        isLoading: Binding<Bool>,
        loadMore: @escaping () async throws -> (),
-       @ViewBuilder content: @escaping (Data.Element) -> Content) { // 5
+       @ViewBuilder content: @escaping (Data.Element) -> Content) {
     _data = data
     _isLoading = isLoading
     self.loadMore = loadMore
@@ -141,12 +141,12 @@ where Data : RandomAccessCollection, Data.Element : Hashable, Data.Element : Pok
                   
               }
           }
-          if isLoading { // 7
+          if isLoading {
             ProgressView()
               .frame(idealWidth: .infinity, maxWidth: .infinity, alignment: .center)
           }
    }.task {
        try? await loadMore()
-   } // 8
+   } 
   }
 }
