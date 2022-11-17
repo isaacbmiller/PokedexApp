@@ -16,7 +16,7 @@ struct ContentView: View {
         NavigationView {
             ScrollView {
                 InfiniteGrid(data: $pokeAPI.PokemonLinks, isLoading: $pokeAPI.isLoading, loadMore: pokeAPI.loadMore, content: {data in
-                    // Create a link to each pokemons page on load
+                    // Create a link to each pokemon's page on load
                     NavigationLink(destination: IndividualPokemonView(pokemon: data.pokemon!), tag: data.pokemon!, selection: $selectedPokemon) {
                         PokemonCell(pokemonData: data)
                             .onTapGesture {
@@ -25,15 +25,12 @@ struct ContentView: View {
                             .padding(.vertical, 4)
                             .padding(.horizontal, 2)
                     }
-                    
-                    
                 })
                 .padding(.horizontal)
             }
             .frame(maxWidth: .infinity)
             .navigationTitle("Pokedex")
         }
-        
     }
 }
 
@@ -41,28 +38,27 @@ struct PokemonCell: View {
     var pokemonData: any PokemonData
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
-            HStack {
                 VStack(alignment: .leading, spacing: 5) {
                     Text(pokemonData.pokemon!.name.capitalized)
-                        .scaledToFit()
-                        .minimumScaleFactor(0.5)
                         .fontWeight(.bold)
                         .lineLimit(1)
                         .foregroundColor(.white)
                         .padding(.bottom, 3)
-                    ForEach(pokemonData.pokemon!.types) { pokemonType in
-                        TypePill(pokemonType: pokemonType)
+                HStack {
+                    
+                    VStack(alignment: .leading) {
+                        ForEach(pokemonData.pokemon!.types) { pokemonType in
+                            TypePill(pokemonType: pokemonType)
+                        }
+                        Spacer()
                     }
                     Spacer()
-                }
-                Spacer()
-                
-                CacheAsyncImage(url: pokemonData.pokemon!.sprites.other!.officialArtwork.frontDefaultURL) { phase in
-                    phase.image?
-                        .resizable()
-                        .frame(height: 75)
-                        .aspectRatio(contentMode: .fit)
-                        
+                    CacheAsyncImage(url: pokemonData.pokemon!.sprites.other!.officialArtwork.frontDefaultURL) { phase in
+                        phase.image?
+                            .resizable()
+                            .frame(height: 75)
+                            .aspectRatio(contentMode: .fit)
+                    }
                 }
                 
             }
@@ -73,7 +69,6 @@ struct PokemonCell: View {
                 .zIndex(-1)
                 .padding(.bottom, 5)
                 .padding(.trailing, 5)
-            
         }
         
         .frame(height: 125)
@@ -81,7 +76,6 @@ struct PokemonCell: View {
         .cornerRadius(10)
         .edgesIgnoringSafeArea([.horizontal, .bottom])
         .shadow(radius: 10)
-            
     }
     
     struct TypePill: View {
@@ -147,6 +141,6 @@ where Data : RandomAccessCollection, Data.Element : Hashable, Data.Element : Pok
           }
    }.task {
        try? await loadMore()
-   } 
+   }
   }
 }
